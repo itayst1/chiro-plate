@@ -22,7 +22,9 @@ import java.net.Socket;
 public class MainActivity extends AppCompatActivity {
 
     TextView counter;
-    DatagramSocket client_socket;
+
+    DatagramSocket UDPSocket;
+    Socket TCPSocket;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,22 +38,24 @@ public class MainActivity extends AppCompatActivity {
         });
         counter = (TextView) findViewById(R.id.counter);
         counter.setText("-1");
-        clientThread();
+        UDPThread();
+        TCPThread();
     }
 
     byte[] buf;
 
-    public void clientThread(){
+    public void UDPThread(){
         new Thread(()->{
             try {
-                client_socket = new DatagramSocket();
+                byte[] buf;
+                UDPSocket = new DatagramSocket();
                 InetAddress IPAddress = InetAddress.getByName("192.168.4.1");
                 buf = new byte[1024];
                 DatagramPacket send_packet = new DatagramPacket(buf, 1024, IPAddress, 12000);
-                client_socket.send(send_packet);
+                UDPSocket.send(send_packet);
                 DatagramPacket receivePacket = new DatagramPacket(buf, buf.length);
                 while(true){
-                    client_socket.receive(receivePacket);
+                    UDPSocket.receive(receivePacket);
                     String received = new String(
                             receivePacket.getData(), 0, receivePacket.getLength());
                     counter.setText(received);
@@ -60,6 +64,29 @@ public class MainActivity extends AppCompatActivity {
             catch (Exception e){
                 e.printStackTrace();
                 counter.setText("-2");
+            }
+        }).start();
+    }
+
+    public void TCPThread(){
+        new Thread(()->{
+            try {
+                byte[] buf = new byte[1024];
+                InetAddress address = InetAddress.getByName("192.168.4.1");;
+                ObjectOutputStream oos = null;
+                InputStream ois = null;
+                // establish socket connection to server
+                TCPSocket = new Socket(address, 5000);
+                //write to socket using ObjectOutputStream
+                oos = new ObjectOutputStream(TCPSocket.getOutputStream());
+                oos.writeObject(null);
+                //read the server response message
+                ois = TCPSocket.getInputStream();
+                int message = ois.read();
+            }
+            catch (Exception e){
+                e.printStackTrace();
+                counter.setText("-3");
             }
         }).start();
     }

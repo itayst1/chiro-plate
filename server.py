@@ -5,14 +5,15 @@ import machine
 from machine import Pin
 
 
-# pin10 = Pin(10, Pin.IN)
-# pin11 = Pin(11, Pin.IN)
-# pin12 = Pin(12, Pin.IN)
-# pin13 = Pin(13, Pin.IN)
+pin18 = Pin(18, Pin.IN)
+pin19 = Pin(19, Pin.IN)
+pin20 = Pin(20, Pin.IN)
+pin21 = Pin(21, Pin.IN)
 
-pin0 = Pin(0, Pin.IN)
+# pin0 = Pin(0, Pin.IN)
 
 counter = 0
+scored = False
 
 def score():
     global counter
@@ -23,85 +24,77 @@ def reset_score():
     counter = 0
 
 def run():
-    p10 = pin10.value()
-    p11 = pin11.value()
-    p12 = pin12.value()
-    p13 = pin13.value()
-    if p10 == 1 or p11 == 1 or p12 == 1 or p13 == 1:
-        score()
-    return p10 + p11 + p12 + p13
+    global scored
+    p18 = pin18.value()
+    p19 = pin19.value()
+    p20 = pin20.value()
+    p21 = pin21.value()
+    pins = p18 + p19 + p20 + p21
+    if pins > 0:
+        if scored == False:
+            score()
+            scored = True
+    else:
+        scored = False
+    return pins
 
-def webpage():
-    #Template HTML
-    html = f"""
-            <!DOCTYPE html>
-            <html>
-            <head>
-            <title>EverPlate Webapp</title>
-            </head>
-            <body>
-            <h1>""" + str(counter) + f"""</h1>
-            </body>
-            </html>
-            """
-    return str(html)
     
-s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-print ("created socket")
+UDP_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+print ("created UDP socket")
+TCP_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+print ("created TCP socket")
 
-
-port = 12000
-
-#if connecting to local wifi
-ssid = 'Oded'
-password = 'Oded2021$'
+UDP_port = 12000
+TCP_port = 5000
 
 def connect(ssid, password):
     wlan = network.WLAN(network.AP_IF)
     #security=0 means no password, can be removed
     wlan.config(essid=ssid, password=password, security=0)
     wlan.active(True)
-#     wlan.connect(ssid, password)
-#     while wlan.isconnected() == False:
-#         print('Waiting for connection...')
-#         time.sleep(1)
     ip = wlan.ifconfig()[0]
     print(f'Connected on {ip}')
-    addr = socket.getaddrinfo('0.0.0.0', port)[0][-1]
-    s.bind(addr)
-    print ("socket binded to %s" %(port)) 
     return ip
+
+def connect_UDP():
+    addr = socket.getaddrinfo('0.0.0.0', UDP_port)[0][-1]
+    UDP_socket.bind(addr)
+    print ("UDP socket binded to %s" %(UDP_port))
+    
+def connect_TCP():
+    addr = socket.getaddrinfo('0.0.0.0', TCP_port)[0][-1]
+    TCP_socket.bind(addr)
+    print ("TCP socket binded to %s" %(TCP_port))
+    TCP_socket.listen(5)
 
 #create the network first parameter is name and second is password
 connect('not a virus', '0')
+connect_TCP()
+connect_UDP()
 
 
 
-# turn on the socket's listening mode 
+# turn on the socket's listening mode
 # s.listen(1)
 # print ("socket is listening")
 
 while True: 
     # Establish connection with client. 
-#     c, addr = s.accept()
-#     print ('Got connection from', addr )
+    c, addr = TCP_socket.accept()
+    print ('Got TCP connection from', addr )
 
     try:
-        m, addr = s.recvfrom(1024)
+        m, addr = UDP_socket.recvfrom(1024)
         while True:
-            s.sendto(str(pin0.value()), addr)
-            time.sleep(0.2)
-#         while True:
-#             c, addr = s.accept()
-#             print ('Got connection from', addr )
-#             request = c.recv(1024)
-#             c.send(str(pin0.value()).encode())
-#             print(pin0.value())
-#             c.close()
-#             time.sleep(0.3)
+            c.send("4")
+            print(run())
+            UDP_socket.sendto(str(counter), addr)
+            time.sleep(0.1)
              
     finally:
         c.close()
-        machine.reset()
-        print("test")
-        break
+#         machine.reset()
+
+break
+
+machine.reset()
