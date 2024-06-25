@@ -1,8 +1,8 @@
 package com.example.plateapp;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -11,7 +11,6 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
@@ -22,6 +21,7 @@ import java.net.Socket;
 public class MainActivity extends AppCompatActivity {
 
     TextView counter;
+    Button reset;
 
     DatagramSocket UDPSocket;
     Socket TCPSocket;
@@ -38,20 +38,30 @@ public class MainActivity extends AppCompatActivity {
         });
         counter = (TextView) findViewById(R.id.counter);
         counter.setText("-1");
-        UDPThread();
+        reset = (Button) findViewById(R.id.reset);
+        reset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                send = "1";
+            }
+        });
         TCPThread();
+        UDPThread();
     }
 
-    byte[] buf;
+    private int UDPPort = 12000;
+    private int TCPPort = 5000;
+    private String send = "0";
 
-    public void UDPThread(){
+    private void UDPThread(){
         new Thread(()->{
             try {
+                Thread.sleep(100);
                 byte[] buf;
                 UDPSocket = new DatagramSocket();
                 InetAddress IPAddress = InetAddress.getByName("192.168.4.1");
                 buf = new byte[1024];
-                DatagramPacket send_packet = new DatagramPacket(buf, 1024, IPAddress, 12000);
+                DatagramPacket send_packet = new DatagramPacket(buf, 1024, IPAddress, UDPPort);
                 UDPSocket.send(send_packet);
                 DatagramPacket receivePacket = new DatagramPacket(buf, buf.length);
                 while(true){
@@ -59,6 +69,11 @@ public class MainActivity extends AppCompatActivity {
                     String received = new String(
                             receivePacket.getData(), 0, receivePacket.getLength());
                     counter.setText(received);
+
+                    byte[] bytes = send.getBytes();
+                    DatagramPacket sendPacket = new DatagramPacket(bytes, bytes.length, IPAddress, UDPPort);
+                    UDPSocket.send(sendPacket);
+                    if(send.equals("1")) send = "0";
                 }
             }
             catch (Exception e){
@@ -68,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
         }).start();
     }
 
-    public void TCPThread(){
+    private void TCPThread(){
         new Thread(()->{
             try {
                 byte[] buf = new byte[1024];
@@ -76,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
                 ObjectOutputStream oos = null;
                 InputStream ois = null;
                 // establish socket connection to server
-                TCPSocket = new Socket(address, 5000);
+                TCPSocket = new Socket(address, TCPPort);
                 //write to socket using ObjectOutputStream
                 oos = new ObjectOutputStream(TCPSocket.getOutputStream());
                 oos.writeObject(null);

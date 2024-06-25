@@ -38,14 +38,11 @@ def run():
         scored = False
     return pins
 
-    
-UDP_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-print ("created UDP socket")
-TCP_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-print ("created TCP socket")
-
 UDP_port = 12000
 TCP_port = 5000
+
+TCP_socket = None
+UDP_socket = None
 
 def connect(ssid, password):
     wlan = network.WLAN(network.AP_IF)
@@ -57,11 +54,18 @@ def connect(ssid, password):
     return ip
 
 def connect_UDP():
+    global UDP_socket
+    UDP_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    print ("created UDP socket")
+    UDP_socket.settimeout(3)
     addr = socket.getaddrinfo('0.0.0.0', UDP_port)[0][-1]
     UDP_socket.bind(addr)
     print ("UDP socket binded to %s" %(UDP_port))
     
 def connect_TCP():
+    global TCP_socket
+    TCP_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    print ("created TCP socket")
     addr = socket.getaddrinfo('0.0.0.0', TCP_port)[0][-1]
     TCP_socket.bind(addr)
     print ("TCP socket binded to %s" %(TCP_port))
@@ -69,32 +73,36 @@ def connect_TCP():
 
 #create the network first parameter is name and second is password
 connect('not a virus', '0')
-connect_TCP()
-connect_UDP()
-
-
-
-# turn on the socket's listening mode
-# s.listen(1)
-# print ("socket is listening")
 
 while True: 
-    # Establish connection with client. 
-    c, addr = TCP_socket.accept()
-    print ('Got TCP connection from', addr )
+    # Establish connection with client.
+    connect_TCP()
+    c, TCP_addr = TCP_socket.accept()
+    print ('Got TCP connection from', TCP_addr )
 
     try:
-        m, addr = UDP_socket.recvfrom(1024)
+        connect_UDP()
+        m, UDP_addr = UDP_socket.recvfrom(1024)
+        print ('Got TCP connection from', UDP_addr )
         while True:
-            c.send("4")
-            print(run())
-            UDP_socket.sendto(str(counter), addr)
+            c.send(str(run()))
+            UDP_socket.sendto(str(counter), UDP_addr)
+            try:
+                data = int(UDP_socket.recv(1024))
+                if data == 1:
+                    reset_score()
+            except:
+                print("fail")
             time.sleep(0.1)
+    except:
+        c.close()
+        TCP_socket.close()
+        UDP_socket.close()
              
     finally:
         c.close()
+        TCP_socket.close()
+        UDP_socket.close()
 #         machine.reset()
-
-break
 
 machine.reset()
