@@ -5,12 +5,17 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothSocket;
+import android.bluetooth.le.BluetoothLeScanner;
+import android.bluetooth.le.ScanCallback;
+import android.bluetooth.le.ScanResult;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -30,6 +35,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -40,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     Socket TCPSocket;
 
     BluetoothSocket bluetoothSocket;
+    BluetoothAdapter bluetoothAdapter;
     OutputStream os;
     InputStream is;
 
@@ -59,6 +66,8 @@ public class MainActivity extends AppCompatActivity {
         reset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                scanLeDevice();
+                counter.setTextSize(20);
 //                send = "1";
                 try {
 //                    os.write("toggle".getBytes());
@@ -67,60 +76,103 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-        final BroadcastReceiver receiver = new BroadcastReceiver() {
-            public void onReceive(Context context, Intent intent) {
-                String action = intent.getAction();
-                counter.setText("10");
-                if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-                    BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                    if (ActivityCompat.checkSelfPermission(getBaseContext(), android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                        ActivityCompat.requestPermissions(MainActivity.this, new String[] {Manifest.permission.BLUETOOTH_CONNECT}, 101);
-                    }
-                    try {
-                        bluetoothSocket = device.createRfcommSocketToServiceRecord(device.getUuids()[0].getUuid());
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            }
-        };
-        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        registerReceiver(receiver, filter);
 //        TCPThread();
 //        UDPThread();
         bluetoothThread();
     }
 
     private void bluetoothThread() {
-        new Thread(() -> {
-            try {
-                BluetoothManager bluetoothManager = getSystemService(BluetoothManager.class);
-                BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
-                if (!bluetoothAdapter.isEnabled()) {
-                    Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-
-                }
-                counter.setText("7");
-                if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(MainActivity.this, new String[] {Manifest.permission.BLUETOOTH_SCAN}, 100);
-                }
-                bluetoothAdapter.startDiscovery();
-                counter.setText("5");
-                Thread.sleep(10000);
-
-//                BluetoothDevice device = (BluetoothDevice) bluetoothAdapter.getBondedDevices().toArray()[0];
-//                socket = device.createRfcommSocketToServiceRecord(device.getUuids()[0].getUuid());
-//                socket.connect();
-                counter.setText("3");
-                os = bluetoothSocket.getOutputStream();
-                is = bluetoothSocket.getInputStream();
+        try {
+            BluetoothManager bluetoothManager = getSystemService(BluetoothManager.class);
+            bluetoothAdapter = bluetoothManager.getAdapter();
+            if (!bluetoothAdapter.isEnabled()) {
+                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             }
-            catch(Exception e){
-                e.printStackTrace();
-                counter.setText("4");
+            counter.setText("7");
+            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.BLUETOOTH_SCAN}, 100);
+            }
+
+//            scanLeDevice();
+
+
+//                Thread.sleep(2000);
+
+//                os = bluetoothSocket.getOutputStream();
+//                is = bluetoothSocket.getInputStream();
+        } catch (Exception e) {
+            e.printStackTrace();
+            counter.setText("4");
+        }
+    }
+
+    private boolean scanning = false;
+    private Handler handler = new Handler();
+
+    // Stops scanning after 10 seconds.
+    private static final long SCAN_PERIOD = 6000;
+
+    private void scanLeDevice() {
+        new Thread(() -> {
+            if (!scanning) {
+                // Stops scanning after a predefined scan period.
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        scanning = false;
+                        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+                            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.BLUETOOTH_SCAN}, 100);
+                        }
+                        bluetoothAdapter.getBluetoothLeScanner().stopScan(leScanCallback);
+
+                        counter.setText(leDeviceList.size() + "");
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, 101);
+                        }
+                        String devices = "";
+                        for(BluetoothDevice device : leDeviceList){
+                            if(device.getName() != null)
+                                devices += device.getName() + "|";
+                        }
+                        counter.setText(devices);
+                        try {
+                            Thread.sleep(2000);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                        String devices2[] = devices.split("|");
+                        for(int i = 0; i < devices2.length; i++){
+                            if(devices2[i] == "mpy-uart"){
+                                counter.setText(leDeviceList.get(i).getName());
+                            }
+                        }
+                    }
+                }, SCAN_PERIOD);
+
+                scanning = true;
+                leDeviceList.clear();
+                bluetoothAdapter.getBluetoothLeScanner().startScan(leScanCallback);
+            } else {
+                scanning = false;
+                bluetoothAdapter.getBluetoothLeScanner().stopScan(leScanCallback);
             }
         }).start();
     }
+
+    private ArrayList<BluetoothDevice> leDeviceList = new ArrayList<>();
+
+    // Device scan callback.
+    private ScanCallback leScanCallback = new ScanCallback() {
+        public void onScanResult(int callbackType, ScanResult result) {
+            super.onScanResult(callbackType, result);
+            leDeviceList.add(result.getDevice());
+        }
+    };
 
     private int UDPPort = 12000;
     private int TCPPort = 5000;
