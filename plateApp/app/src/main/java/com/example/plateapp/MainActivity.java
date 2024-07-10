@@ -44,6 +44,8 @@ public class MainActivity extends AppCompatActivity {
 
     private BluetoothGatt bluetoothGatt = null;
 
+    private String connectedDevice = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,9 +82,10 @@ public class MainActivity extends AppCompatActivity {
                         scan.setText("start scan");
                         Button temp;
                         for (BluetoothDevice device : bluetoothUtils.getItemList()) {
-                            @SuppressLint("MissingPermission") String name = device.getName();
+                            @SuppressLint("MissingPermission") String name = device.getName().toString();
                             if (name != null) {
                                 temp = new Button(MainActivity.this);
+                                temp.setAllCaps(false);
                                 temp.setText(name);
                                 temp.setTextSize(35);
                                 temp.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
@@ -92,8 +95,14 @@ public class MainActivity extends AppCompatActivity {
                                         for(int i = 0; i < items.getChildCount(); i++){
                                             ((Button)items.getChildAt(i)).setTextColor(0xFFFFFFFF);
                                         }
-                                        ((Button) view).setTextColor(0xFF00FF00);
-                                        connectSelected(((Button) view).getText().toString());
+                                        if(!connectedDevice.equals(((Button) view).getText().toString())) {
+                                            ((Button) view).setTextColor(0xFF00FF00);
+                                            connectSelected(((Button) view).getText().toString());
+                                            connectedDevice = ((Button) view).getText().toString();
+                                        }
+                                        else if(connectedDevice.equals(((Button) view).getText().toString())){
+                                            disconnect();
+                                        }
                                     }
                                 });
                                 items.addView(temp);
@@ -140,6 +149,7 @@ public class MainActivity extends AppCompatActivity {
             bluetoothGatt.close();
             bluetoothGatt = null;
             this.unregisterReceiver(disconnectBroadcastReceiver);
+            connectedDevice = "";
         }
     }
 
