@@ -1,13 +1,15 @@
 package com.example.plateapp;
 
+import static android.nfc.NfcAdapter.EXTRA_DATA;
+
 import android.Manifest;
-import android.bluetooth.BluetoothAdapter;
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothManager;
-import android.bluetooth.BluetoothSocket;
-import android.bluetooth.le.BluetoothLeScanner;
-import android.bluetooth.le.ScanCallback;
-import android.bluetooth.le.ScanResult;
+import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCallback;
+import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattService;
+import android.bluetooth.BluetoothProfile;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -18,37 +20,29 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
+import android.widget.TableLayout;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.util.ArrayList;
+import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
-    TextView counter;
-    Button reset;
+    private Button scan;
+    private Button toggle;
+    private TableLayout items;
+    private BluetoothUtils bluetoothUtils = new BluetoothUtils();
 
-    DatagramSocket UDPSocket;
-    Socket TCPSocket;
+    BroadcastReceiver disconnectBroadcastReceiver;
 
-    BluetoothSocket bluetoothSocket;
-    BluetoothAdapter bluetoothAdapter;
-    OutputStream os;
-    InputStream is;
+    private BluetoothGatt bluetoothGatt = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,174 +54,108 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        counter = (TextView) findViewById(R.id.counter);
-        counter.setText("-1");
-        reset = (Button) findViewById(R.id.reset);
-        reset.setOnClickListener(new View.OnClickListener() {
+
+        items = (TableLayout) findViewById(R.id.items);
+        items.setPadding(0, 30, 0, 0);
+        scan = (Button) findViewById(R.id.scan);
+        toggle = (Button) findViewById(R.id.toggle);
+
+        scan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                scanLeDevice();
-                counter.setTextSize(20);
-//                send = "1";
-                try {
-//                    os.write("toggle".getBytes());
-                } catch (Exception e) {
-//                    throw new RuntimeException(e);
+                if (ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED
+                        | ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{android.Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT}, 100);
+                    return;
+                }
+
+                disconnect();
+                bluetoothUtils.startBluetoothScan();
+                scan.setText("scanning...");
+                items.removeAllViews();
+                scan.setEnabled(false);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        scan.setText("start scan");
+                        Button temp;
+                        for (BluetoothDevice device : bluetoothUtils.getItemList()) {
+                            @SuppressLint("MissingPermission") String name = device.getName();
+                            if (name != null) {
+                                temp = new Button(MainActivity.this);
+                                temp.setText(name);
+                                temp.setTextSize(35);
+                                temp.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+                                temp.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        for(int i = 0; i < items.getChildCount(); i++){
+                                            ((Button)items.getChildAt(i)).setTextColor(0xFFFFFFFF);
+                                        }
+                                        ((Button) view).setTextColor(0xFF00FF00);
+                                        connectSelected(((Button) view).getText().toString());
+                                    }
+                                });
+                                items.addView(temp);
+                            }
+                        }
+                        scan.setEnabled(true);
+                    }
+                }, 5400);
+            }
+        });
+        toggle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(bluetoothGatt != null){
+                    Log.d("debug", "toggle");
                 }
             }
         });
-//        TCPThread();
-//        UDPThread();
-        bluetoothThread();
+        disconnectBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if(bluetoothGatt != null)
+                    disconnect(); // disconnect now, else would be queued until UI re-attached
+            }
+        };
     }
 
-    private void bluetoothThread() {
-        try {
-            BluetoothManager bluetoothManager = getSystemService(BluetoothManager.class);
-            bluetoothAdapter = bluetoothManager.getAdapter();
-            if (!bluetoothAdapter.isEnabled()) {
-                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+
+    @SuppressLint("MissingPermission")
+    private void connectSelected(String name){
+        for(BluetoothDevice device : bluetoothUtils.getItemList()){
+            if(device.getName().equals(name)){
+                disconnect();
+                ContextCompat.registerReceiver(this, disconnectBroadcastReceiver, new IntentFilter("Disconnect"), ContextCompat.RECEIVER_NOT_EXPORTED);
+                bluetoothGatt = device.connectGatt(this, false, bluetoothGattCallback);
             }
-            counter.setText("7");
-            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.BLUETOOTH_SCAN}, 100);
-            }
-
-//            scanLeDevice();
-
-
-//                Thread.sleep(2000);
-
-//                os = bluetoothSocket.getOutputStream();
-//                is = bluetoothSocket.getInputStream();
-        } catch (Exception e) {
-            e.printStackTrace();
-            counter.setText("4");
         }
     }
 
-    private boolean scanning = false;
-    private Handler handler = new Handler();
-
-    // Stops scanning after 10 seconds.
-    private static final long SCAN_PERIOD = 6000;
-
-    private void scanLeDevice() {
-        new Thread(() -> {
-            if (!scanning) {
-                // Stops scanning after a predefined scan period.
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        scanning = false;
-                        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
-                            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.BLUETOOTH_SCAN}, 100);
-                        }
-                        bluetoothAdapter.getBluetoothLeScanner().stopScan(leScanCallback);
-
-                        counter.setText(leDeviceList.size() + "");
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
-                        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, 101);
-                        }
-                        String devices = "";
-                        for(BluetoothDevice device : leDeviceList){
-                            if(device.getName() != null)
-                                devices += device.getName() + "|";
-                        }
-                        counter.setText(devices);
-                        try {
-                            Thread.sleep(2000);
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
-                        String devices2[] = devices.split("|");
-                        for(int i = 0; i < devices2.length; i++){
-                            if(devices2[i] == "mpy-uart"){
-                                counter.setText(leDeviceList.get(i).getName());
-                            }
-                        }
-                    }
-                }, SCAN_PERIOD);
-
-                scanning = true;
-                leDeviceList.clear();
-                bluetoothAdapter.getBluetoothLeScanner().startScan(leScanCallback);
-            } else {
-                scanning = false;
-                bluetoothAdapter.getBluetoothLeScanner().stopScan(leScanCallback);
-            }
-        }).start();
+    @SuppressLint("MissingPermission")
+    private void disconnect(){
+        if(bluetoothGatt != null){
+            bluetoothGatt.disconnect();
+            bluetoothGatt.close();
+            bluetoothGatt = null;
+            this.unregisterReceiver(disconnectBroadcastReceiver);
+        }
     }
 
-    private ArrayList<BluetoothDevice> leDeviceList = new ArrayList<>();
+    private final BluetoothGattCallback bluetoothGattCallback = new BluetoothGattCallback() {
+        @Override
+        public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+            if (newState == BluetoothProfile.STATE_CONNECTED) {
 
-    // Device scan callback.
-    private ScanCallback leScanCallback = new ScanCallback() {
-        public void onScanResult(int callbackType, ScanResult result) {
-            super.onScanResult(callbackType, result);
-            leDeviceList.add(result.getDevice());
+            } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+                // disconnected from the GATT Server
+            }
         }
     };
 
-    private int UDPPort = 12000;
-    private int TCPPort = 5000;
-    private String send = "0";
+    @SuppressLint("MissingPermission")
+    public void writeCharacteristic() {
 
-    private void UDPThread(){
-        new Thread(()->{
-            try {
-                Thread.sleep(100);
-                byte[] buf;
-                UDPSocket = new DatagramSocket();
-                InetAddress IPAddress = InetAddress.getByName("192.168.4.1");
-                buf = new byte[1024];
-                DatagramPacket send_packet = new DatagramPacket(buf, 1024, IPAddress, UDPPort);
-                UDPSocket.send(send_packet);
-                DatagramPacket receivePacket = new DatagramPacket(buf, buf.length);
-                while(true){
-                    UDPSocket.receive(receivePacket);
-                    String received = new String(
-                            receivePacket.getData(), 0, receivePacket.getLength());
-                    counter.setText(received);
-
-                    byte[] bytes = send.getBytes();
-                    DatagramPacket sendPacket = new DatagramPacket(bytes, bytes.length, IPAddress, UDPPort);
-                    UDPSocket.send(sendPacket);
-                    if(send.equals("1")) send = "0";
-                }
-            }
-            catch (Exception e){
-                e.printStackTrace();
-                counter.setText("-2");
-            }
-        }).start();
-    }
-
-    private void TCPThread(){
-        new Thread(()->{
-            try {
-                byte[] buf = new byte[1024];
-                InetAddress address = InetAddress.getByName("192.168.4.1");;
-                ObjectOutputStream oos = null;
-                InputStream ois = null;
-                // establish socket connection to server
-                TCPSocket = new Socket(address, TCPPort);
-                //write to socket using ObjectOutputStream
-                oos = new ObjectOutputStream(TCPSocket.getOutputStream());
-                oos.writeObject(null);
-                //read the server response message
-                ois = TCPSocket.getInputStream();
-                int message = ois.read();
-            }
-            catch (Exception e){
-                e.printStackTrace();
-                counter.setText("-3");
-            }
-        }).start();
     }
 }
