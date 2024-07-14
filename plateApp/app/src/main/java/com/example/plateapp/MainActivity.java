@@ -8,6 +8,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothProfile;
 import android.content.BroadcastReceiver;
@@ -73,16 +74,16 @@ public class MainActivity extends AppCompatActivity {
 
                 disconnect();
                 bluetoothUtils.startBluetoothScan();
-                scan.setText("scanning...");
+                scan.setText(R.string.scanning);
                 items.removeAllViews();
                 scan.setEnabled(false);
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        scan.setText("start scan");
+                        scan.setText(R.string.start_scan);
                         Button temp;
                         for (BluetoothDevice device : bluetoothUtils.getItemList()) {
-                            @SuppressLint("MissingPermission") String name = device.getName().toString();
+                            @SuppressLint("MissingPermission") String name = device.getName();
                             if (name != null) {
                                 temp = new Button(MainActivity.this);
                                 temp.setAllCaps(false);
@@ -118,6 +119,15 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if(bluetoothGatt != null){
                     Log.d("debug", "toggle");
+                    Log.d("debug", bluetoothGatt.getServices().size() + "");
+
+                    for(BluetoothGattService service : bluetoothGatt.getServices()){
+                        Log.d("service:", "service " + service.getUuid().toString());
+                        for(BluetoothGattCharacteristic characteristic : service.getCharacteristics())
+                            Log.d("characteristic", "characteristic "+characteristic.getUuid().toString());
+                    }
+                    writeCharacteristic();
+
                 }
             }
         });
@@ -157,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
-
+                bluetoothGatt.discoverServices();
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 // disconnected from the GATT Server
             }
@@ -166,6 +176,9 @@ public class MainActivity extends AppCompatActivity {
 
     @SuppressLint("MissingPermission")
     public void writeCharacteristic() {
-
+        BluetoothGattCharacteristic writeCharacteristic = bluetoothGatt.getServices().get(2).getCharacteristics().get(1);
+        writeCharacteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
+        writeCharacteristic.setValue("toggle\r\n".getBytes());
+        bluetoothGatt.writeCharacteristic(writeCharacteristic);
     }
 }
