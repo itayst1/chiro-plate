@@ -27,3 +27,4 @@ def on_rx(data):
 while True:
     if sp.is_connected():  # Check if a BLE connection is established
         sp.on_write(on_rx)  # Set the callback function for data reception
+        sp.send("5")
