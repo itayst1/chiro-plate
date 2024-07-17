@@ -99,6 +99,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private final BluetoothGattCallback bluetoothGattCallback = new BluetoothGattCallback() {
+        @SuppressLint("MissingPermission")
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
@@ -135,8 +136,8 @@ public class MainActivity extends AppCompatActivity {
     };
 
     @SuppressLint("MissingPermission")
-    public void writeCharacteristic() {
-        writeCharacteristic.setValue("toggle\r\n".getBytes());
+    public void writeCharacteristic(String data) {
+        writeCharacteristic.setValue(data.getBytes());
         bluetoothGatt.writeCharacteristic(writeCharacteristic);
     }
 
@@ -150,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("MissingPermission")
     public void onToggleClick(View view) {
         if(bluetoothGatt != null){
-            writeCharacteristic();
+            writeCharacteristic("toggle\n\r");
         }
     }
 
