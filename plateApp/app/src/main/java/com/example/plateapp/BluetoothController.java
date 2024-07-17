@@ -29,7 +29,7 @@ public class BluetoothController {
 
     private BluetoothAdapter m_bluetoothAdapter;
 
-    private ArrayList<BluetoothDevice> m_listItems = new ArrayList<>();
+    private ArrayList<BluetoothDevice> m_devicesList;
 
     public static BluetoothController getInstance(){
         if(m_instance == null)
@@ -37,7 +37,9 @@ public class BluetoothController {
         return m_instance;
     }
 
-    private BluetoothController(){}
+    private BluetoothController() {
+        m_devicesList = new ArrayList<>();
+    }
 
     public void startBluetoothScan() {
         try {
@@ -53,9 +55,8 @@ public class BluetoothController {
     }
 
     private boolean scanning = false;
-    private Handler handler = new Handler();
 
-    // Stops scanning after 10 seconds.
+    // Stops scanning after 5 seconds.
     private static final long SCAN_PERIOD = 5000;
 
     @SuppressLint("MissingPermission")
@@ -63,7 +64,7 @@ public class BluetoothController {
         new Thread(() -> {
             if (!scanning) {
                 // Stops scanning after a predefined scan period.
-                handler.postDelayed(new Runnable() {
+                new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         scanning = false;
@@ -72,7 +73,7 @@ public class BluetoothController {
                 }, SCAN_PERIOD);
 
                 scanning = true;
-                m_listItems.clear();
+                m_devicesList.clear();
                 m_bluetoothAdapter.getBluetoothLeScanner().startScan(leScanCallback);
             } else {
                 scanning = false;
@@ -86,14 +87,14 @@ public class BluetoothController {
         public void onScanResult(int callbackType, ScanResult result) {
             super.onScanResult(callbackType, result);
             String name = result.getDevice().getName();
-            if (name != null && !m_listItems.contains(result.getDevice())) {
-                m_listItems.add(result.getDevice());
+            if (name != null && !m_devicesList.contains(result.getDevice())) {
+                m_devicesList.add(result.getDevice());
             }
         }
     };
 
     public ArrayList<BluetoothDevice> getItemList() {
-        return m_listItems;
+        return m_devicesList;
     }
 
 
