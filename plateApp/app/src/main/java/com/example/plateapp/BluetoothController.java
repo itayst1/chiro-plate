@@ -16,6 +16,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Handler;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -41,36 +42,32 @@ public class BluetoothController {
         m_devicesList = new ArrayList<>();
     }
 
-    public void startBluetoothScan() {
-        try {
-            m_bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-            if (!m_bluetoothAdapter.isEnabled()) {
-                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                return;
-            }
-            scanLeDevice();
-        } catch (Exception e) {
-            e.printStackTrace();
+    public boolean startBluetoothScan() {
+        m_bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (!m_bluetoothAdapter.isEnabled()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            return false;
         }
+        scanLeDevice();
+        return true;
     }
 
     private boolean scanning = false;
 
-    // Stops scanning after 5 seconds.
-    private static final long SCAN_PERIOD = 5000;
+    Handler handler = new Handler();
 
     @SuppressLint("MissingPermission")
     private void scanLeDevice() {
         new Thread(() -> {
             if (!scanning) {
                 // Stops scanning after a predefined scan period.
-                new Handler().postDelayed(new Runnable() {
+                handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         scanning = false;
                         m_bluetoothAdapter.getBluetoothLeScanner().stopScan(leScanCallback);
                     }
-                }, SCAN_PERIOD);
+                }, 5000);
 
                 scanning = true;
                 m_devicesList.clear();
@@ -93,7 +90,7 @@ public class BluetoothController {
         }
     };
 
-    public ArrayList<BluetoothDevice> getItemList() {
+    public ArrayList<BluetoothDevice> getDevicesList() {
         return m_devicesList;
     }
 
@@ -104,9 +101,9 @@ public class BluetoothController {
         @Override
         public void onReceive(Context context, Intent intent) {
             if(m_bluetoothGatt != null)
-                disconnect(); // disconnect now, else would be queued until UI re-attached
+                disconnect();
         }
-    };;
+    };
 
     private BluetoothGatt m_bluetoothGatt = null;
 
@@ -121,11 +118,12 @@ public class BluetoothController {
 
     @SuppressLint("MissingPermission")
     public void connectSelected(String name, Context context){
-        for(BluetoothDevice device : BluetoothController.getInstance().getItemList()){
+        for(BluetoothDevice device : getDevicesList()){
             if(device.getName().equals(name)){
                 disconnect();
                 ContextCompat.registerReceiver(context, disconnectBroadcastReceiver, new IntentFilter("Disconnect"), ContextCompat.RECEIVER_NOT_EXPORTED);
                 m_bluetoothGatt = device.connectGatt(context, false, bluetoothGattCallback);
+                Toast.makeText(context, "connected", Toast.LENGTH_SHORT).show();
             }
         }
     }
