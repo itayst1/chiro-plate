@@ -16,7 +16,6 @@ pin2 = Pin(19, Pin.IN)
 pin3 = Pin(20, Pin.IN)
 pin4 = Pin(21, Pin.IN)
 
-scored = False
 activatedSensorIdx = 0
 
 def run():
@@ -36,13 +35,14 @@ def run():
 # Define a callback function to handle received data
 def on_rx(data):
     print("Data received: ", data)  # Print the received data
-    #if data == b'reset':  # Check if the received data is "reset"
-        # write here what to do
+    if data == b'is plate':  # Check the received data
+        sp.send("yes")
 
 # Start an infinite loop
 while True:
     if sp.is_connected():  # Check if a BLE connection is established
-#         sp.on_write(on_rx)  # Set the callback function for data reception
-#         sp.send(run())  #sends data
-        print(run())
+        sp.on_write(on_rx)  # Set the callback function for data reception
+        data = run()
+        sp.send(str(data))  #sends data
+#         print(data)
         time.sleep(0.01)

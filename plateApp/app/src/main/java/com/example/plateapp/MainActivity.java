@@ -3,6 +3,7 @@ package com.example.plateapp;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothDevice;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,10 +21,11 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import java.util.Objects;
+
 public class MainActivity extends AppCompatActivity {
 
     private Button scan;
-    private Button toggle;
     private TableLayout items;
 
     private BluetoothController bluetoothController;
@@ -42,16 +44,8 @@ public class MainActivity extends AppCompatActivity {
         items = (TableLayout) findViewById(R.id.items);
         items.setPadding(0, 30, 0, 0);
         scan = (Button) findViewById(R.id.scan);
-        toggle = (Button) findViewById(R.id.toggle);
 
         bluetoothController = BluetoothController.getInstance();
-    }
-
-    @SuppressLint("MissingPermission")
-    public void onToggleClick(View view) {
-        if(bluetoothController.getBluetoothGatt() != null){
-            bluetoothController.writeCharacteristic("toggle\n\r");
-        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.S)
@@ -92,10 +86,25 @@ public class MainActivity extends AppCompatActivity {
             button.setTextColor(0xFF00FF00);
             bluetoothController.connectSelected(button.getText().toString(), MainActivity.this);
             bluetoothController.setConnectedDevice(button.getText().toString());
-            Toast.makeText(MainActivity.this, "connecting...", Toast.LENGTH_SHORT).show();
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    long startTime = System.currentTimeMillis();
+                    while((System.currentTimeMillis() - startTime) <= 3000){
+                        bluetoothController.writeData("is plate");
+                        if(Objects.equals(bluetoothController.readData(), "yes")){
+                            startActivity(new Intent(MainActivity.this, GameActivity.class));
+                            return;
+                        }
+                    }
+                    button.setTextColor(0xFFFFFFFF);
+                    bluetoothController.disconnect();
+                }
+            }, 1000);
+
         } else if (bluetoothController.getConnectedDevice().equals(button.getText().toString())) {
             bluetoothController.disconnect();
-            Toast.makeText(MainActivity.this, "disconnected", Toast.LENGTH_SHORT).show();
         }
     }
 
