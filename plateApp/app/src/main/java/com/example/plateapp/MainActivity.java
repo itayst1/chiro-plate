@@ -58,8 +58,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         bluetoothController.disconnect();
-        if(!bluetoothController.startBluetoothScan())
+        if(!bluetoothController.startBluetoothScan()) {
+            Toast.makeText(MainActivity.this, "Please activate Bluetooth and allow permissions.", Toast.LENGTH_SHORT).show();
             return;
+        }
         scan.setText(R.string.scanning);
         items.removeAllViews();
         scan.setEnabled(false);

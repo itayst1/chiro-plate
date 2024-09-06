@@ -32,15 +32,13 @@ import java.util.concurrent.TimeUnit;
 
 public class BluetoothController {
 
-    private static BluetoothController m_instance = null;
+    private static BluetoothController m_instance = new BluetoothController();
 
     private BluetoothAdapter m_bluetoothAdapter;
 
     private ArrayList<BluetoothDevice> m_devicesList;
 
     public static BluetoothController getInstance(){
-        if(m_instance == null)
-            m_instance = new BluetoothController();
         return m_instance;
     }
 
