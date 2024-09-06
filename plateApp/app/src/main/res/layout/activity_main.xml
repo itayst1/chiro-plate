@@ -5,14 +5,21 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#3E403F"
+    android:backgroundTint="#3E403F"
     tools:context=".MainActivity">
 
     <Button
         android:id="@+id/scan"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:backgroundTint="#00BC65"
+        android:fontFamily="@font/assistant_semibold"
         android:onClick="onScanClick"
-        android:text="start scan"
+        android:text="Start Scan"
+        android:textAllCaps="false"
+        android:textColor="#FFFFFF"
+        android:textColorLink="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"

@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -85,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
             ((Button) items.getChildAt(i)).setTextColor(0xFFFFFFFF);
         }
         if (!bluetoothController.getConnectedDevice().equals(button.getText().toString())) {
-            button.setTextColor(0xFF00FF00);
+            button.setTextColor(0xFF00bc65);
             bluetoothController.connectSelected(button.getText().toString(), MainActivity.this);
             bluetoothController.setConnectedDevice(button.getText().toString());
 
@@ -116,6 +117,7 @@ public class MainActivity extends AppCompatActivity {
         deviceButton.setText(name);
         deviceButton.setTextSize(35);
         deviceButton.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        deviceButton.setBackgroundColor(0xFF5b5f60);
         deviceButton.setOnClickListener(this::onDeviceClick);
         return deviceButton;
     }
