@@ -16,7 +16,7 @@
         android:backgroundTint="#00BC65"
         android:fontFamily="@font/assistant_semibold"
         android:onClick="onScanClick"
-        android:text="Start Scan"
+        android:text="התחל סריקה"
         android:textAllCaps="false"
         android:textColor="#FFFFFF"
         android:textColorLink="#FFFFFF"
