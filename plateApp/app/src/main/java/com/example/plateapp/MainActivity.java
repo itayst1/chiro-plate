@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
             ((Button) items.getChildAt(i)).setTextColor(0xFFFFFFFF);
         }
         if (!bluetoothController.getConnectedDevice().equals(button.getText().toString())) {
-            button.setTextColor(0xFF00bc65);
+            button.setTextColor(0xE000bc65);
             bluetoothController.connectSelected(button.getText().toString(), MainActivity.this);
             bluetoothController.setConnectedDevice(button.getText().toString());
 
@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
                             return;
                         }
                     }
-                    button.setTextColor(0xFFFFFFFF);
+                    button.setTextColor(0xE0FFFFFF);
                     bluetoothController.disconnect();
                 }
             }, 1000);
@@ -117,7 +117,8 @@ public class MainActivity extends AppCompatActivity {
         deviceButton.setText(name);
         deviceButton.setTextSize(35);
         deviceButton.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-        deviceButton.setBackgroundColor(0xFF5b5f60);
+        deviceButton.setBackgroundColor(0xE05b5f60);
+        deviceButton.setTextColor(0xE0FFFFFF);
         deviceButton.setOnClickListener(this::onDeviceClick);
         return deviceButton;
     }
