@@ -35,7 +35,7 @@ public class GameActivity extends AppCompatActivity {
             public void run() {
                 startGame();
             }
-        }, 1000);
+        }, 500);
     }
 
     public void startGame(){

@@ -26,8 +26,9 @@
         android:layout_width="140dp"
         android:layout_height="70dp"
         android:backgroundTint="#5B5F60"
+        android:onClick="onTutorialClick"
         android:shadowColor="#00BC65"
-        android:text="פתיחה"
+        android:text="שלב הדרכה"
         android:textColor="#FFFFFF"
         android:textColorHighlight="#00BC65"
         android:textColorHint="#00BC65"
@@ -85,7 +86,10 @@
         android:id="@+id/imageView"
         android:layout_width="259dp"
         android:layout_height="230dp"
-        tools:layout_editor_absoluteX="76dp"
-        tools:layout_editor_absoluteY="79dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.155"
         tools:srcCompat="@tools:sample/avatars" />
 </androidx.constraintlayout.widget.ConstraintLayout>

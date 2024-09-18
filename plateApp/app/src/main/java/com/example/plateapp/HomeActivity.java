@@ -1,7 +1,9 @@
 package com.example.plateapp;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,6 +18,9 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_home);
+    }
 
+    public void onTutorialClick(View view){
+        startActivity(new Intent(HomeActivity.this, GameActivity.class));
     }
 }

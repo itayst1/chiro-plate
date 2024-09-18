@@ -42,9 +42,6 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        startActivity(new Intent(MainActivity.this, HomeActivity.class));
-
-
         items = (TableLayout) findViewById(R.id.items);
         items.setPadding(0, 30, 0, 0);
         scan = (Button) findViewById(R.id.scan);
@@ -99,10 +96,10 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     long startTime = System.currentTimeMillis();
-                    while((System.currentTimeMillis() - startTime) <= 3000){
+                    while((System.currentTimeMillis() - startTime) <= 2000){
                         bluetoothController.writeData("is plate");
                         if(Objects.equals(bluetoothController.readData(), "yes")){
-                            startActivity(new Intent(MainActivity.this, GameActivity.class));
+                            startActivity(new Intent(MainActivity.this, HomeActivity.class));
                             return;
                         }
                     }
