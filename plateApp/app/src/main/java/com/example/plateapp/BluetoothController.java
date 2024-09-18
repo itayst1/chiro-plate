@@ -43,7 +43,7 @@ public class BluetoothController {
     }
 
     private BluetoothController() {
-        m_devicesList = new ArrayList<>();
+        m_devicesList = new ArrayList<>(5);
     }
 
     public boolean startBluetoothScan() {

@@ -73,17 +73,19 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 scan.setText(R.string.start_scan);
                 Button deviceButton;
-                for (BluetoothDevice device : bluetoothController.getDevicesList())
+                for (BluetoothDevice device : bluetoothController.getDevicesList()) {
                     items.addView(createDeviceButton(device.getName()));
+                }
                 scan.setEnabled(true);
             }
-        }, 5400);
+        }, 3000);
     }
 
     public void onDeviceClick(View view){
         Button button = (Button) view;
         for (int i = 0; i < items.getChildCount(); i++) {
             ((Button) items.getChildAt(i)).setTextColor(0xFFFFFFFF);
+            items.getChildAt(i).setEnabled(false);
         }
         if (!bluetoothController.getConnectedDevice().equals(button.getText().toString())) {
             button.setTextColor(0xE000bc65);
@@ -103,6 +105,10 @@ public class MainActivity extends AppCompatActivity {
                     }
                     button.setTextColor(0xE0FFFFFF);
                     bluetoothController.disconnect();
+                    Toast.makeText(MainActivity.this, "ההתחברות נכשלה", Toast.LENGTH_SHORT).show();
+                    for (int i = 0; i < items.getChildCount(); i++) {
+                        items.getChildAt(i).setEnabled(true);
+                    }
                 }
             }, 1000);
 
