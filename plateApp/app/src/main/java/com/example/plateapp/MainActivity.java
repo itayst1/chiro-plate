@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -62,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
 
         bluetoothController.disconnect();
         if(!bluetoothController.startBluetoothScan()) {
-            Toast.makeText(MainActivity.this, "Please activate Bluetooth and allow permissions.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, "בבקשה הדלק בלוטות' ואשר הרשאות.", Toast.LENGTH_SHORT).show();
             return;
         }
         scan.setText(R.string.scanning);
@@ -75,20 +76,22 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 scan.setText(R.string.start_scan);
                 Button deviceButton;
-                for (BluetoothDevice device : bluetoothController.getDevicesList())
+                for (BluetoothDevice device : bluetoothController.getDevicesList()) {
                     items.addView(createDeviceButton(device.getName()));
+                }
                 scan.setEnabled(true);
             }
-        }, 5400);
+        }, 3000);
     }
 
     public void onDeviceClick(View view){
         Button button = (Button) view;
         for (int i = 0; i < items.getChildCount(); i++) {
             ((Button) items.getChildAt(i)).setTextColor(0xFFFFFFFF);
+            items.getChildAt(i).setEnabled(false);
         }
         if (!bluetoothController.getConnectedDevice().equals(button.getText().toString())) {
-            button.setTextColor(0xFF00FF00);
+            button.setTextColor(0xE000bc65);
             bluetoothController.connectSelected(button.getText().toString(), MainActivity.this);
             bluetoothController.setConnectedDevice(button.getText().toString());
 
@@ -103,8 +106,12 @@ public class MainActivity extends AppCompatActivity {
                             return;
                         }
                     }
-                    button.setTextColor(0xFFFFFFFF);
+                    button.setTextColor(0xE0FFFFFF);
                     bluetoothController.disconnect();
+                    Toast.makeText(MainActivity.this, "ההתחברות נכשלה", Toast.LENGTH_SHORT).show();
+                    for (int i = 0; i < items.getChildCount(); i++) {
+                        items.getChildAt(i).setEnabled(true);
+                    }
                 }
             }, 1000);
 
@@ -119,6 +126,8 @@ public class MainActivity extends AppCompatActivity {
         deviceButton.setText(name);
         deviceButton.setTextSize(35);
         deviceButton.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        deviceButton.setBackgroundColor(0xE05b5f60);
+        deviceButton.setTextColor(0xE0FFFFFF);
         deviceButton.setOnClickListener(this::onDeviceClick);
         return deviceButton;
     }

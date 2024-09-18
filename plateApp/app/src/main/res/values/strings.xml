@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">plate app</string>
-    <string name="start_scan">start scan</string>
-    <string name="scanning">scanning...</string>
+    <string name="start_scan">התחל סריקה</string>
+    <string name="scanning">סורק...</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
     <string name="second_fragment_label">Second Fragment</string>
