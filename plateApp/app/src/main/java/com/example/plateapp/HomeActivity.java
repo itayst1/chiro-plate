@@ -23,4 +23,8 @@ public class HomeActivity extends AppCompatActivity {
     public void onTutorialClick(View view){
         startActivity(new Intent(HomeActivity.this, GameActivity.class));
     }
+
+    public void onLevelsClick(View view){
+        startActivity(new Intent(HomeActivity.this, LevelsActivity.class));
+    }
 }

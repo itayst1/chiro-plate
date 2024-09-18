@@ -47,6 +47,7 @@
         android:layout_width="140dp"
         android:layout_height="70dp"
         android:backgroundTint="#5B5F60"
+        android:onClick="onLevelsClick"
         android:shadowColor="#00BC65"
         android:text="שלבים"
         android:textColor="#FFFFFF"
