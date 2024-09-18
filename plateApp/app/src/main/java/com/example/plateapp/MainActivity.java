@@ -41,6 +41,9 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
+        startActivity(new Intent(MainActivity.this, HomeActivity.class));
+
+
         items = (TableLayout) findViewById(R.id.items);
         items.setPadding(0, 30, 0, 0);
         scan = (Button) findViewById(R.id.scan);
