@@ -27,4 +27,9 @@ public class HomeActivity extends AppCompatActivity {
     public void onLevelsClick(View view){
         startActivity(new Intent(HomeActivity.this, LevelsActivity.class));
     }
+
+    public void onDisconnectClick(View view){
+        BluetoothController.getInstance().disconnect();
+        startActivity(new Intent(HomeActivity.this, MainActivity.class));
+    }
 }

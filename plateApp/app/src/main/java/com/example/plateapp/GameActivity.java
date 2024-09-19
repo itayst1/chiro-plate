@@ -68,8 +68,7 @@ public class GameActivity extends AppCompatActivity {
 
     public void onExitClick(View view){
         play = false;
-        bluetoothController.disconnect();
-        startActivity(new Intent(GameActivity.this, MainActivity.class));
+        startActivity(new Intent(GameActivity.this, HomeActivity.class));
     }
 
 }
