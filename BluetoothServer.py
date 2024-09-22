@@ -18,21 +18,12 @@ pin2 = Pin(19, Pin.IN)
 pin3 = Pin(20, Pin.IN)
 pin4 = Pin(21, Pin.IN)
 
-activatedSensorIdx = 0
+activatedSensors = 0
 
 def run():
-    global activatedSensorIdx
-    if pin1.value() == 1:
-        activatedSensorIdx = 1
-    elif pin2.value() == 1:
-        activatedSensorIdx = 2
-    elif pin3.value() == 1:
-        activatedSensorIdx = 3
-    elif pin4.value() == 1:
-        activatedSensorIdx = 4
-    else:
-        activatedSensorIdx = 0
-    return activatedSensorIdx
+    global activatedSensors
+    activatedSensors = pin1.value() + pin3.value() * 10 + pin4.value() * 100 + pin2.value() * 1000
+    return activatedSensors
 
 # Define a callback function to handle received data
 def on_rx(data):

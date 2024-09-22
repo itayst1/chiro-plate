@@ -81,7 +81,7 @@ public class GameActivity extends AppCompatActivity {
                         scored = true;
                         updateScore(data);
                     }
-                    Thread.sleep(100);
+                    Thread.sleep(50);
                 }
                 catch (Exception e){
                     e.printStackTrace();
@@ -90,10 +90,17 @@ public class GameActivity extends AppCompatActivity {
         }).start();
     }
 
-    private void updateScore(int idx){
-        String cur = (Integer.parseInt(holes[idx-1].getText().toString()) + 1) + "";
-        holes[idx - 1].setText(cur);
-        colors.setImageResource(colorsArr[idx-1]);
+    private void updateScore(int activated){
+        for(int i = 0; i < 4; i++){
+            int isActive = activated % 10;
+            if(activated > 0)
+                activated /= 10;
+            if(isActive == 1){
+                String cur = (Integer.parseInt(holes[i].getText().toString()) + 1) + "";
+                holes[i].setText(cur);
+                colors.setImageResource(colorsArr[i]);
+            }
+        }
     }
 
     public void onExitClick(View view){
