@@ -18,12 +18,13 @@
         android:scaleType="fitXY"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/timer"
         app:srcCompat="@drawable/all_active" />
 
     <TextView
-        android:id="@+id/textView1"
+        android:id="@+id/redCounter"
         android:layout_width="100dp"
         android:layout_height="40dp"
         android:text="0"
@@ -33,12 +34,13 @@
         android:textSize="30sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.25" />
+        app:layout_constraintTop_toTopOf="@+id/colors"
+        app:layout_constraintVertical_bias="0.205" />
 
     <TextView
-        android:id="@+id/textView4"
+        android:id="@+id/greenCounter"
         android:layout_width="100dp"
         android:layout_height="40dp"
         android:text="0"
@@ -46,28 +48,30 @@
         android:textColor="#FFFFFF"
         android:textColorLink="#FFFFFF"
         android:textSize="30sp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/colors"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.75" />
+        app:layout_constraintVertical_bias="0.8" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/yellowCounter"
         android:layout_width="100dp"
         android:layout_height="40dp"
         android:text="0"
         android:textAlignment="center"
         android:textColor="#FFFFFFFF"
         android:textSize="30sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.045"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toBottomOf="@+id/colors"
+        app:layout_constraintEnd_toEndOf="@+id/colors"
+        app:layout_constraintHorizontal_bias="0.109"
+        app:layout_constraintStart_toStartOf="@+id/colors"
+        app:layout_constraintTop_toTopOf="@+id/colors"
+        app:layout_constraintVertical_bias="0.505" />
 
     <TextView
-        android:id="@+id/textView3"
+        android:id="@+id/blueCounter"
         android:layout_width="100dp"
         android:layout_height="40dp"
         android:text="0"
@@ -76,10 +80,11 @@
         android:textColorLink="#FFFFFFFF"
         android:textSize="30sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.954"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="@+id/colors"
+        app:layout_constraintHorizontal_bias="0.9"
+        app:layout_constraintStart_toStartOf="@+id/colors"
+        app:layout_constraintTop_toTopOf="@+id/colors"
+        app:layout_constraintVertical_bias="0.506" />
 
     <Button
         android:id="@+id/exitButton"
@@ -92,9 +97,40 @@
         android:textColorLink="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.487"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.942" />
+        app:layout_constraintVertical_bias="0.95" />
+
+    <TextView
+        android:id="@+id/timer"
+        android:layout_width="200dp"
+        android:layout_height="60dp"
+        android:text="0"
+        android:textAlignment="center"
+        android:textColor="#FFFFFF"
+        android:textColorLink="#FFFFFF"
+        android:textSize="40sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.006" />
+
+    <TextView
+        android:id="@+id/iterations"
+        android:layout_width="200dp"
+        android:layout_height="60dp"
+        android:text="0"
+        android:textAlignment="center"
+        android:textColor="#FFFFFF"
+        android:textColorLink="#FFFFFF"
+        android:textSize="40sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.006" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

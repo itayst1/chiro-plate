@@ -1,15 +1,11 @@
 package com.example.plateapp;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -21,6 +17,8 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     public void onTutorialClick(View view){
+        Game.getInstance().setTime(10);
+        Game.getInstance().setIterations(5);
         startActivity(new Intent(HomeActivity.this, GameActivity.class));
     }
 
