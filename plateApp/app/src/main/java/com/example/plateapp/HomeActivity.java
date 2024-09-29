@@ -17,8 +17,10 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     public void onTutorialClick(View view){
-        Game.getInstance().setTime(10);
-        Game.getInstance().setIterations(5);
+        GameInstance.getInstance().setMode(0);
+        GameInstance.getInstance().setTime(-1);
+        GameInstance.getInstance().setIterations(-1);
+        GameInstance.getInstance().setProbabilities(new double[]{0.25, 0.25, 0.25, 0.25});
         startActivity(new Intent(HomeActivity.this, GameActivity.class));
     }
 

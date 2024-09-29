@@ -1,14 +1,10 @@
 package com.example.plateapp;
 
 import android.content.Intent;
-import android.hardware.biometrics.BiometricManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewParent;
-import android.view.autofill.AutofillValue;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 
@@ -38,11 +34,13 @@ public class LevelsActivity extends AppCompatActivity {
 
         levels = findViewById(R.id.levels);
 
-        levelsData = new HashMap<>();
+        levelsData = GameInstance.getInstance().getLevelsData();
 
-        levelsData.put(1, "undone,30,10");
-        levelsData.put(2, "done,20,15");
-        levelsData.put(3, "undone,10,10");
+        if(levelsData.isEmpty()) {
+            levelsData.put(1, "undone,1,1,100,10");
+            levelsData.put(2, "undone,2,1,30,10");
+            levelsData.put(3, "undone,3,1,30,1");
+        }
 
         initiateGrid();
     }
@@ -54,8 +52,10 @@ public class LevelsActivity extends AppCompatActivity {
     public void onLevelClick(View view){
         Button temp = (Button) view;
         String[] data = levelsData.get(Integer.parseInt((String) temp.getText())).split(",");
-        Game.getInstance().setTime(Integer.parseInt(data[1]));
-        Game.getInstance().setIterations(Integer.parseInt(data[2]));
+        GameInstance.getInstance().setLevel(Integer.parseInt(data[1]));
+        GameInstance.getInstance().setMode(Integer.parseInt(data[2]));
+        GameInstance.getInstance().setTime(Integer.parseInt(data[3]));
+        GameInstance.getInstance().setIterations(Integer.parseInt(data[4]));
         startActivity(new Intent(LevelsActivity.this, GameActivity.class));
     }
 

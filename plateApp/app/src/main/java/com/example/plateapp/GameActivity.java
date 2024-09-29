@@ -4,12 +4,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
-import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.Random;
 
 public class GameActivity extends AppCompatActivity {
 
@@ -20,10 +22,12 @@ public class GameActivity extends AppCompatActivity {
     private TextView iterations;
 
     private BluetoothController bluetoothController;
-    private Game gameInstance;
+    private GameInstance gameInstance;
 
     private boolean play;
     private int remainingIterations;
+
+    private Random random = new Random();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,10 +53,10 @@ public class GameActivity extends AppCompatActivity {
         };
 
         bluetoothController = BluetoothController.getInstance();
-        gameInstance = Game.getInstance();
+        gameInstance = GameInstance.getInstance();
 
         play = true;
-        remainingIterations = Game.getInstance().getIterations();
+        remainingIterations = GameInstance.getInstance().getIterations();
 
         if(remainingIterations > 0)
             iterations.setText(remainingIterations + "");
@@ -65,8 +69,8 @@ public class GameActivity extends AppCompatActivity {
                 startGame();
             }
         }, 500);
-        if(Game.getInstance().getTime() > 0) {
-            timer.setText("⧖" + Game.getInstance().getTime());
+        if(GameInstance.getInstance().getTime() > 0) {
+            timer.setText("⧖" + GameInstance.getInstance().getTime());
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -93,7 +97,16 @@ public class GameActivity extends AppCompatActivity {
     }
 
     public void startGame(){
-        new Thread(()->{
+        if(gameInstance.getMode() == 0){
+            getTurorialThread().start();
+        }
+        else{
+            getLevelsThread().start();
+        }
+    }
+
+    private Thread getTurorialThread(){
+        return new Thread(()->{
             try {
                 Thread.sleep(200);
                 colors.setImageResource(R.drawable.inactive);
@@ -126,8 +139,7 @@ public class GameActivity extends AppCompatActivity {
                         scored = false;
                     } else if (!scored) {
                         scored = true;
-                        updateScore(data);
-                        iterations.setText(--remainingIterations + "");
+                        updateScore(data, -1);
                     }
                     Thread.sleep(50);
                 }
@@ -135,20 +147,78 @@ public class GameActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }
-        }).start();
+        });
     }
 
-    private void updateScore(int activated){
+    private Thread getLevelsThread(){
+        return new Thread(()->{
+            try {
+                Thread.sleep(200);
+                colors.setImageResource(R.drawable.inactive);
+                Thread.sleep(250);
+                for (int i = 0; i < 4; i++) {
+                    colors.setImageResource(colorsArr[i]);
+                    Thread.sleep(200);
+                }
+                Thread.sleep(100);
+                colors.setImageResource(R.drawable.all_active);
+                Thread.sleep(250);
+                colors.setImageResource(R.drawable.inactive);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            colors.setImageResource(R.drawable.inactive);
+            boolean scored = true;
+            int goal = 0;
+            while(play){
+                if(remainingIterations == 0) {
+                    play = false;
+                    iterations.setText("ניצחת!!");
+                    colors.setImageResource(R.drawable.inactive);
+                    gameInstance.getLevelsData().put(gameInstance.getLevel(), gameInstance.getLevelsData().get(GameInstance.getInstance().getLevel()).replace("undone", "done"));
+                    break;
+                }
+                try {
+                    int data = Integer.parseInt(bluetoothController.readData());
+                    if (data == 0) {
+                        if(scored) {
+                            goal = getNext();
+                            colors.setImageResource(colorsArr[goal]);
+                        }
+                        scored = false;
+                    } else if (!scored) {
+                        scored = updateScore(data, goal);
+                    }
+                    Thread.sleep(50);
+                }
+                catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    private boolean updateScore(int data, int goal){
         for(int i = 0; i < 4; i++){
-            int isActive = activated % 10;
-            if(activated > 0)
-                activated /= 10;
+            int isActive = data % 10;
+            if(data > 0)
+                data /= 10;
             if(isActive == 1){
-                String cur = (Integer.parseInt(holes[i].getText().toString()) + 1) + "";
-                holes[i].setText(cur);
-                colors.setImageResource(colorsArr[i]);
+                if(i == goal || goal == -1) {
+                    String cur = (Integer.parseInt(holes[i].getText().toString()) + 1) + "";
+                    holes[i].setText(cur);
+                    colors.setImageResource(colorsArr[i]);
+                    if(remainingIterations > 0)
+                        iterations.setText(--remainingIterations + "");
+                    return true;
+                }
             }
         }
+        return false;
+    }
+
+    private int getNext(){
+        return random.nextInt(4);
     }
 
     public void onExitClick(View view){
