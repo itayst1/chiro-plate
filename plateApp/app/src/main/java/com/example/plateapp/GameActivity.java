@@ -54,8 +54,10 @@ public class GameActivity extends AppCompatActivity {
         play = true;
         remainingIterations = Game.getInstance().getIterations();
 
-        timer.setText("⧖" + Game.getInstance().getTime());
-        iterations.setText(remainingIterations + "");
+        if(remainingIterations > 0)
+            iterations.setText(remainingIterations + "");
+        else
+            iterations.setText("∞");
 
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -64,6 +66,7 @@ public class GameActivity extends AppCompatActivity {
             }
         }, 500);
         if(Game.getInstance().getTime() > 0) {
+            timer.setText("⧖" + Game.getInstance().getTime());
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -85,6 +88,8 @@ public class GameActivity extends AppCompatActivity {
                 }
             }, 2000);
         }
+        else
+            timer.setText("⧖∞");
     }
 
     public void startGame(){
@@ -107,7 +112,7 @@ public class GameActivity extends AppCompatActivity {
             colors.setImageResource(R.drawable.inactive);
             boolean scored = false;
             while(play){
-                if(remainingIterations <= 0){
+                if(remainingIterations == 0){
                     play = false;
                     iterations.setText("ניצחת!!");
                     colors.setImageResource(R.drawable.inactive);

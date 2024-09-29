@@ -44,10 +44,11 @@
 
     <ScrollView
         android:id="@+id/scroll"
-        android:layout_width="409dp"
-        android:layout_height="592dp"
+        android:layout_width="0dp"
+        android:layout_height="580dp"
         android:layout_weight="1"
         android:scrollbars="none"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -57,11 +58,13 @@
 
         <TableLayout
             android:id="@+id/items"
-            android:layout_width="409dp"
-            android:layout_height="592dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:isScrollContainer="true"
             android:nestedScrollingEnabled="true"
+            android:orientation="horizontal"
             android:overScrollMode="ifContentScrolls"
+            android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="@+id/scroll"
             app:layout_constraintEnd_toEndOf="@+id/scroll"
             app:layout_constraintStart_toStartOf="@+id/scroll" />
