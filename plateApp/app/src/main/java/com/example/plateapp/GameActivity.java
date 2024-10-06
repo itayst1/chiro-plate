@@ -1,10 +1,10 @@
 package com.example.plateapp;
 
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -29,6 +29,11 @@ public class GameActivity extends AppCompatActivity {
 
     private Random random = new Random();
 
+    private MediaPlayer scoreSound;
+    private MediaPlayer winSound;
+    private MediaPlayer loseSound;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +49,11 @@ public class GameActivity extends AppCompatActivity {
 
         timer = (TextView) findViewById(R.id.timer);
         iterations = (TextView) findViewById(R.id.iterations);
+
+        scoreSound = MediaPlayer.create(this, R.raw.score_sound);
+        winSound = MediaPlayer.create(this, R.raw.win_sound);
+        loseSound = MediaPlayer.create(this, R.raw.lose_sound);
+
 
         colorsArr = new int[] {
             R.drawable.red_active,
@@ -86,6 +96,7 @@ public class GameActivity extends AppCompatActivity {
                                 play = false;
                                 colors.setImageResource(R.drawable.inactive);
                                 timer.setText("משחק נגמר");
+                                loseSound.start();
                             }
                         }
                     }.start();
@@ -125,12 +136,6 @@ public class GameActivity extends AppCompatActivity {
             colors.setImageResource(R.drawable.inactive);
             boolean scored = false;
             while(play){
-                if(remainingIterations == 0){
-                    play = false;
-                    iterations.setText("ניצחת!!");
-                    colors.setImageResource(R.drawable.inactive);
-                    break;
-                }
                 try {
                     int data = Integer.parseInt(bluetoothController.readData());
                     if (data == 0) {
@@ -174,6 +179,7 @@ public class GameActivity extends AppCompatActivity {
                 if(remainingIterations == 0) {
                     play = false;
                     iterations.setText("ניצחת!!");
+                    winSound.start();
                     colors.setImageResource(R.drawable.inactive);
                     gameInstance.getLevelsData().put(gameInstance.getLevel(), gameInstance.getLevelsData().get(GameInstance.getInstance().getLevel()).replace("undone", "done"));
                     break;
@@ -210,8 +216,11 @@ public class GameActivity extends AppCompatActivity {
                     String cur = (Integer.parseInt(holes[i].getText().toString()) + 1) + "";
                     holes[i].setText(cur);
                     colors.setImageResource(colorsArr[i]);
-                    if(remainingIterations > 0)
+                    if(remainingIterations > 0) {
                         iterations.setText(--remainingIterations + "");
+                    }
+                    scoreSound.seekTo(0);
+                    scoreSound.start();
                     return true;
                 }
             }
@@ -223,8 +232,6 @@ public class GameActivity extends AppCompatActivity {
         double result = random.nextDouble();
         double total = 0;
         for(int i = 0; i < probabilities.length; i++){
-            Log.d("probability", i + ": " + probabilities[i]);
-            Log.d("total", total + "");
             if(probabilities[i] == 0){
                 continue;
             }

@@ -37,7 +37,7 @@ public class LevelsActivity extends AppCompatActivity {
         levelsData = GameInstance.getInstance().getLevelsData();
 
         if(levelsData.isEmpty()) {//isComplete,level,mode,time,iterations,probabilities
-            levelsData.put(1, "undone,1,1,100,10,0.25,0.25,0.25,0.25");
+            levelsData.put(1, "undone,1,1,20,10,0.25,0.25,0.25,0.25");
             levelsData.put(2, "undone,2,1,50,10,0.5,0,0.5,0");
             levelsData.put(3, "undone,3,1,50,10,0,0.5,0,0.5");
             levelsData.put(4, "undone,4,1,50,15,0,0.33,0.33,0.33");
