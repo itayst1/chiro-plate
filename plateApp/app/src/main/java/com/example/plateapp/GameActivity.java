@@ -169,7 +169,7 @@ public class GameActivity extends AppCompatActivity {
             }
             colors.setImageResource(R.drawable.inactive);
             boolean scored = true;
-            int goal = 0;
+            int goal = 0, prevGoal = goal;
             while(play){
                 if(remainingIterations == 0) {
                     play = false;
@@ -182,7 +182,9 @@ public class GameActivity extends AppCompatActivity {
                     int data = Integer.parseInt(bluetoothController.readData());
                     if (data == 0) {
                         if(scored) {
-                            goal = getNext();
+                            while(goal == prevGoal)
+                                goal = getNext(gameInstance.getProbabilities());
+                            prevGoal = goal;
                             colors.setImageResource(colorsArr[goal]);
                         }
                         scored = false;
@@ -217,7 +219,20 @@ public class GameActivity extends AppCompatActivity {
         return false;
     }
 
-    private int getNext(){
+    private int getNext(double[] probabilities){
+        double result = random.nextDouble();
+        double total = 0;
+        for(int i = 0; i < probabilities.length; i++){
+            Log.d("probability", i + ": " + probabilities[i]);
+            Log.d("total", total + "");
+            if(probabilities[i] == 0){
+                continue;
+            }
+            total += probabilities[i];
+            if(result <= total){
+                return i;
+            }
+        }
         return random.nextInt(4);
     }
 
