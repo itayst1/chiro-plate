@@ -3,7 +3,9 @@ package com.example.plateapp;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothDevice;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,10 +22,11 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import java.util.Objects;
+
 public class MainActivity extends AppCompatActivity {
 
     private Button scan;
-    private Button toggle;
     private TableLayout items;
 
     private BluetoothController bluetoothController;
@@ -42,20 +45,13 @@ public class MainActivity extends AppCompatActivity {
         items = (TableLayout) findViewById(R.id.items);
         items.setPadding(0, 30, 0, 0);
         scan = (Button) findViewById(R.id.scan);
-        toggle = (Button) findViewById(R.id.toggle);
 
         bluetoothController = BluetoothController.getInstance();
     }
 
-    @SuppressLint("MissingPermission")
-    public void onToggleClick(View view) {
-        if(bluetoothController.getBluetoothGatt() != null){
-            bluetoothController.writeCharacteristic("toggle\n\r");
-        }
-    }
-
     @RequiresApi(api = Build.VERSION_CODES.S)
     public void onScanClick(View v) {
+
         //check for permissions and if not found return.
         if (ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED
                 | ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
@@ -64,8 +60,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         bluetoothController.disconnect();
-        if(!bluetoothController.startBluetoothScan())
+        if(!bluetoothController.startBluetoothScan()) {
+            Toast.makeText(MainActivity.this, "בבקשה הדלק בלוטות' ואשר הרשאות.", Toast.LENGTH_SHORT).show();
             return;
+        }
         scan.setText(R.string.scanning);
         items.removeAllViews();
         scan.setEnabled(false);
@@ -76,26 +74,47 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 scan.setText(R.string.start_scan);
                 Button deviceButton;
-                for (BluetoothDevice device : bluetoothController.getDevicesList())
+                for (BluetoothDevice device : bluetoothController.getDevicesList()) {
                     items.addView(createDeviceButton(device.getName()));
+                }
                 scan.setEnabled(true);
             }
-        }, 5400);
+        }, 3000);
     }
 
     public void onDeviceClick(View view){
         Button button = (Button) view;
         for (int i = 0; i < items.getChildCount(); i++) {
             ((Button) items.getChildAt(i)).setTextColor(0xFFFFFFFF);
+            items.getChildAt(i).setEnabled(false);
         }
         if (!bluetoothController.getConnectedDevice().equals(button.getText().toString())) {
-            button.setTextColor(0xFF00FF00);
+            button.setTextColor(0xE000bc65);
             bluetoothController.connectSelected(button.getText().toString(), MainActivity.this);
             bluetoothController.setConnectedDevice(button.getText().toString());
-            Toast.makeText(MainActivity.this, "connecting...", Toast.LENGTH_SHORT).show();
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    long startTime = System.currentTimeMillis();
+                    while((System.currentTimeMillis() - startTime) <= 2000){
+                        bluetoothController.writeData("is plate");
+                        if(Objects.equals(bluetoothController.readData(), "yes")){
+                            startActivity(new Intent(MainActivity.this, HomeActivity.class));
+                            return;
+                        }
+                    }
+                    button.setTextColor(0xE0FFFFFF);
+                    bluetoothController.disconnect();
+                    Toast.makeText(MainActivity.this, "ההתחברות נכשלה", Toast.LENGTH_SHORT).show();
+                    for (int i = 0; i < items.getChildCount(); i++) {
+                        items.getChildAt(i).setEnabled(true);
+                    }
+                }
+            }, 1000);
+
         } else if (bluetoothController.getConnectedDevice().equals(button.getText().toString())) {
             bluetoothController.disconnect();
-            Toast.makeText(MainActivity.this, "disconnected", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -105,6 +124,8 @@ public class MainActivity extends AppCompatActivity {
         deviceButton.setText(name);
         deviceButton.setTextSize(35);
         deviceButton.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        deviceButton.setBackgroundColor(0xE05b5f60);
+        deviceButton.setTextColor(0xE0FFFFFF);
         deviceButton.setOnClickListener(this::onDeviceClick);
         return deviceButton;
     }

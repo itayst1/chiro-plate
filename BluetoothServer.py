@@ -4,6 +4,8 @@ from machine import Pin
 import bluetooth
 from ble_simple_peripheral import BLESimplePeripheral
 
+# time.sleep(5)
+
 # Create a Bluetooth Low Energy (BLE) object
 ble = bluetooth.BLE()
 
@@ -16,33 +18,24 @@ pin2 = Pin(19, Pin.IN)
 pin3 = Pin(20, Pin.IN)
 pin4 = Pin(21, Pin.IN)
 
-scored = False
-activatedSensorIdx = 0
+activatedSensors = 0
 
 def run():
-    global activatedSensorIdx
-    if pin1.value() == 1:
-        activatedSensorIdx = 1
-    elif pin2.value() == 1:
-        activatedSensorIdx = 2
-    elif pin3.value() == 1:
-        activatedSensorIdx = 3
-    elif pin4.value() == 1:
-        activatedSensorIdx = 4
-    else:
-        activatedSensorIdx = 0
-    return activatedSensorIdx
+    global activatedSensors
+    activatedSensors = pin1.value() + pin3.value() * 10 + pin4.value() * 100 + pin2.value() * 1000
+    return activatedSensors
 
 # Define a callback function to handle received data
 def on_rx(data):
     print("Data received: ", data)  # Print the received data
-    #if data == b'reset':  # Check if the received data is "reset"
-        # write here what to do
+    if data == b'is plate':  # Check the received data
+        sp.send("yes")
 
 # Start an infinite loop
 while True:
     if sp.is_connected():  # Check if a BLE connection is established
-#         sp.on_write(on_rx)  # Set the callback function for data reception
-#         sp.send(run())  #sends data
-        print(run())
+        sp.on_write(on_rx)  # Set the callback function for data reception
+        data = run()
+        sp.send(str(data))  #sends data
+#         print(data)
         time.sleep(0.01)

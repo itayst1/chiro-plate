@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#3e403f">
+
+    <EditText
+        android:id="@+id/user_code"
+        android:layout_width="200dp"
+        android:layout_height="43dp"
+
+        android:background="@drawable/rounded_corners"
+        android:fontFamily="@font/assistant_semibold"
+        android:hint="קוד משתמש"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/default_level"
+        android:layout_width="140dp"
+        android:layout_height="70dp"
+        android:backgroundTint="#5B5F60"
+        android:onClick="onTutorialClick"
+        android:shadowColor="#00BC65"
+        android:text="שלב הדרכה"
+        android:textColor="#FFFFFF"
+        android:textColorHighlight="#00BC65"
+        android:textColorHint="#00BC65"
+        android:textColorLink="@color/white"
+        android:textStyle="normal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/user_code"
+        app:layout_constraintVertical_bias="0.034"
+        app:strokeColor="#00BC65" />
+
+    <Button
+        android:id="@+id/levels"
+        android:layout_width="140dp"
+        android:layout_height="70dp"
+        android:backgroundTint="#5B5F60"
+        android:onClick="onLevelsClick"
+        android:shadowColor="#00BC65"
+        android:text="שלבים"
+        android:textColor="#FFFFFF"
+        android:textColorHighlight="#00BC65"
+        android:textColorHint="#00BC65"
+        android:textColorLink="@color/white"
+        android:textStyle="normal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/user_code"
+        app:layout_constraintVertical_bias="0.291"
+        app:strokeColor="#00BC65" />
+
+    <Button
+        android:id="@+id/patients"
+        android:layout_width="140dp"
+        android:layout_height="70dp"
+        android:backgroundTint="#5B5F60"
+        android:shadowColor="#00BC65"
+        android:text="המטופלים שלי"
+        android:textColor="#FFFFFF"
+        android:textColorHighlight="#00BC65"
+        android:textColorHint="#00BC65"
+        android:textColorLink="@color/white"
+        android:textStyle="normal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/user_code"
+        app:layout_constraintVertical_bias="0.547"
+        app:strokeColor="#00BC65" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="259dp"
+        android:layout_height="230dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.155"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="106dp"
+        android:layout_height="52dp"
+        android:backgroundTint="#A91B1B"
+        android:onClick="onDisconnectClick"
+        android:text="התנתקות"
+        android:textColor="#FFFFFF"
+        android:textColorLink="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.976" />
+</androidx.constraintlayout.widget.ConstraintLayout>

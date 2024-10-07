@@ -22,24 +22,28 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class BluetoothController {
 
-    private static BluetoothController m_instance = null;
+    private static BluetoothController m_instance = new BluetoothController();
 
     private BluetoothAdapter m_bluetoothAdapter;
 
     private ArrayList<BluetoothDevice> m_devicesList;
 
     public static BluetoothController getInstance(){
-        if(m_instance == null)
-            m_instance = new BluetoothController();
         return m_instance;
     }
 
     private BluetoothController() {
-        m_devicesList = new ArrayList<>();
+        m_devicesList = new ArrayList<>(5);
     }
 
     public boolean startBluetoothScan() {
@@ -109,7 +113,7 @@ public class BluetoothController {
 
     private String m_connectedDevice = "";
 
-    private BluetoothGattCharacteristic m_writeCharacteristic, m_readCharacteristic;
+    private BluetoothGattCharacteristic m_writeCharacteristic = null, m_readCharacteristic = null;
 
     public BluetoothGatt getBluetoothGatt() {return m_bluetoothGatt;}
 
@@ -123,7 +127,6 @@ public class BluetoothController {
                 disconnect();
                 ContextCompat.registerReceiver(context, disconnectBroadcastReceiver, new IntentFilter("Disconnect"), ContextCompat.RECEIVER_NOT_EXPORTED);
                 m_bluetoothGatt = device.connectGatt(context, false, bluetoothGattCallback);
-                Toast.makeText(context, "connected", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -135,6 +138,8 @@ public class BluetoothController {
             m_bluetoothGatt.close();
             m_bluetoothGatt = null;
             m_connectedDevice = "";
+            m_readCharacteristic = null;
+            m_writeCharacteristic = null;
         }
     }
 
@@ -152,7 +157,6 @@ public class BluetoothController {
         @Override
         public void onCharacteristicChanged(@NonNull BluetoothGatt gatt, @NonNull BluetoothGattCharacteristic characteristic, @NonNull byte[] value) {
             super.onCharacteristicChanged(gatt, characteristic, value);
-            Log.d("read", characteristic.getStringValue(0));
         }
 
         @SuppressLint("MissingPermission")
@@ -169,6 +173,7 @@ public class BluetoothController {
                 desc.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
                 gatt.writeDescriptor(desc);
                 Log.i("characteristics", "done");
+
             } else {
                 Log.w("TAG", "onServicesDiscovered received: " + status);
             }
@@ -176,10 +181,17 @@ public class BluetoothController {
     };
 
     @SuppressLint("MissingPermission")
-    public void writeCharacteristic(String data) {
-        m_writeCharacteristic.setValue(data.getBytes());
-        m_bluetoothGatt.writeCharacteristic(m_writeCharacteristic);
+    public void writeData(String data) {
+        if(m_writeCharacteristic != null) {
+            m_writeCharacteristic.setValue(data.getBytes());
+            m_bluetoothGatt.writeCharacteristic(m_writeCharacteristic);
+        }
     }
 
+    public String readData(){
+        if(m_readCharacteristic != null)
+            return m_readCharacteristic.getStringValue(0);
+        return "";
+    }
 
 }

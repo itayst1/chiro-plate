@@ -5,58 +5,70 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#3E403F"
+    android:backgroundTint="#3E403F"
     tools:context=".MainActivity">
 
     <Button
         android:id="@+id/scan"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:backgroundTint="#00BC65"
         android:onClick="onScanClick"
-        android:text="start scan"
+        android:text="התחל סריקה"
+        android:textAllCaps="false"
+        android:textColor="#FFFFFF"
+        android:textColorLink="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.173"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.079" />
+        app:layout_constraintVertical_bias="0.087" />
 
-    <TableLayout
-        android:id="@+id/items"
-        android:layout_width="409dp"
-        android:layout_height="592dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toggle">
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-    </TableLayout>
-
-    <Button
-        android:id="@+id/toggle"
+    <TextView
+        android:id="@+id/howTo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="onToggleClick"
-        android:text="toggle"
+        android:paddingLeft="5sp"
+        android:paddingRight="5sp"
+        android:text="כרגע אינך מחובר ל[הכנס שם פרוייקט], אנא לחץ על כפתור &quot;התחל סריקה&quot; על מנת למצוא את ה[הכנס שם פרוייקט] שלך ולחץ עליו על מנת להתחבר."
+        android:textAlignment="center"
+        android:textColor="#FFFFFF"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/scroll"
+        app:layout_constraintStart_toStartOf="@+id/scroll"
+        app:layout_constraintTop_toTopOf="@+id/scroll"
+        app:layout_constraintVertical_bias="0.060000002" />
+
+    <ScrollView
+        android:id="@+id/scroll"
+        android:layout_width="0dp"
+        android:layout_height="580dp"
+        android:layout_weight="1"
+        android:scrollbars="none"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.812"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.079" />
+        app:layout_constraintTop_toBottomOf="@+id/scan"
+        app:layout_constraintVertical_bias="1.0"
+        tools:ignore="SpeakableTextPresentCheck">
+
+        <TableLayout
+            android:id="@+id/items"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:isScrollContainer="true"
+            android:nestedScrollingEnabled="true"
+            android:orientation="horizontal"
+            android:overScrollMode="ifContentScrolls"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="@+id/scroll"
+            app:layout_constraintEnd_toEndOf="@+id/scroll"
+            app:layout_constraintStart_toStartOf="@+id/scroll" />
+    </ScrollView>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

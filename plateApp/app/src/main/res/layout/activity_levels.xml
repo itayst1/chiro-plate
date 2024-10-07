@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#3e403f"
+    tools:context=".LevelsActivity">
+
+    <Button
+        android:id="@+id/default_level"
+        android:layout_width="81dp"
+        android:layout_height="52dp"
+        android:backgroundTint="#5B5F60"
+        android:onClick="onHomeClick"
+        android:shadowColor="#00BC65"
+        android:text="בית"
+        android:textColor="#FFFFFF"
+        android:textColorHighlight="#00BC65"
+        android:textColorHint="#00BC65"
+        android:textColorLink="@color/white"
+        android:textStyle="normal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.106"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.044"
+        app:strokeColor="#00BC65" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="84dp"
+        android:layout_height="27dp"
+        android:text="שלבים:"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.937"
+        app:layout_constraintStart_toEndOf="@+id/default_level"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.043" />
+
+    <ScrollView
+        android:id="@+id/LevelsScroll"
+        android:layout_width="0dp"
+        android:layout_height="620dp"
+        android:layout_weight="1"
+        android:scrollbars="none"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.4"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0"
+        tools:ignore="SpeakableTextPresentCheck">
+
+        <TableLayout
+            android:id="@+id/levels"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:isScrollContainer="true"
+            android:nestedScrollingEnabled="true"
+            android:orientation="horizontal"
+            android:overScrollMode="ifContentScrolls"
+            android:stretchColumns="0,1"
+            app:layout_constraintBottom_toBottomOf="@+id/LevelsScroll"
+            app:layout_constraintEnd_toEndOf="@+id/LevelsScroll"
+            app:layout_constraintStart_toStartOf="@+id/LevelsScroll" />
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
