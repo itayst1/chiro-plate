@@ -36,11 +36,11 @@ public class LevelsActivity extends AppCompatActivity {
 
         levelsData = GameInstance.getInstance().getLevelsData();
 
-        if(levelsData.isEmpty()) {//isComplete,level,mode,time,iterations,probabilities
-            levelsData.put(1, "undone,1,1,20,10,0.25,0.25,0.25,0.25");
-            levelsData.put(2, "undone,2,1,50,10,0.5,0,0.5,0");
-            levelsData.put(3, "undone,3,1,50,10,0,0.5,0,0.5");
-            levelsData.put(4, "undone,4,1,50,15,0,0.33,0.33,0.33");
+        if(levelsData.isEmpty()) {//isComplete,level,time,iterations,probabilities
+            levelsData.put(1, "undone,1,20,10,0.25,0.25,0.25,0.25");
+            levelsData.put(2, "undone,2,50,10,0.5,0,0.5,0");
+            levelsData.put(3, "undone,3,50,10,0,0.5,0,0.5");
+            levelsData.put(4, "undone,4,50,15,0,0.33,0.33,0.33");
         }
 
         initiateGrid();
@@ -53,13 +53,13 @@ public class LevelsActivity extends AppCompatActivity {
     public void onLevelClick(View view){
         Button temp = (Button) view;
         String[] data = levelsData.get(Integer.parseInt((String) temp.getText())).split(",");
+        GameInstance.getInstance().setMode(false);
         GameInstance.getInstance().setLevel(Integer.parseInt(data[1]));
-        GameInstance.getInstance().setMode(Integer.parseInt(data[2]));
-        GameInstance.getInstance().setTime(Integer.parseInt(data[3]));
-        GameInstance.getInstance().setIterations(Integer.parseInt(data[4]));
+        GameInstance.getInstance().setTime(Integer.parseInt(data[2]));
+        GameInstance.getInstance().setIterations(Integer.parseInt(data[3]));
         double[] probabilities = new double[4];
-        for(int i = 5; i < 9; i++){
-            probabilities[i-5] = Double.parseDouble(data[i]);
+        for(int i = 4; i < 8; i++){
+            probabilities[i-4] = Double.parseDouble(data[i]);
         }
         GameInstance.getInstance().setProbabilities(probabilities);
         startActivity(new Intent(LevelsActivity.this, GameActivity.class));

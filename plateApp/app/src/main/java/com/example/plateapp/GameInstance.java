@@ -5,7 +5,7 @@ import java.util.HashMap;
 public class GameInstance {
 
     private int m_level;
-    private int m_mode; //0=tutorial 1=level
+    private boolean m_tutorial;
     private int m_time, m_iterations;
     private double[] m_probabilities;
 
@@ -15,7 +15,7 @@ public class GameInstance {
 
     private GameInstance(){
         this.m_level = 0;
-        this.m_mode = 0;
+        this.m_tutorial = false;
         this.m_time = 0;
         this.m_iterations = 0;
         this.m_probabilities = new double[] {0.0, 0.0, 0.0, 0.0};
@@ -34,8 +34,8 @@ public class GameInstance {
         return this.m_level;
     }
 
-    public int getMode(){
-        return this.m_mode;
+    public boolean isTutorial(){
+        return this.m_tutorial;
     }
 
     public int getTime(){
@@ -54,8 +54,8 @@ public class GameInstance {
         this.m_level = level;
     }
 
-    public void setMode(int mode){
-        this.m_mode = mode;
+    public void setMode(boolean isTutorial){
+        this.m_tutorial = isTutorial;
     }
 
     public void setTime(int time){

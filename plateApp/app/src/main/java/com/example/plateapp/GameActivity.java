@@ -108,7 +108,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
     public void startGame(){
-        if(gameInstance.getMode() == 0){
+        if(gameInstance.isTutorial()){
             getTurorialThread().start();
         }
         else{
