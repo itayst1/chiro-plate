@@ -4,13 +4,15 @@ from machine import Pin
 import bluetooth
 from ble_simple_peripheral import BLESimplePeripheral
 
-# time.sleep(5)
+time.sleep(1)
 
 # Create a Bluetooth Low Energy (BLE) object
 ble = bluetooth.BLE()
 
 # Create an instance of the BLESimplePeripheral class with the BLE object
 sp = BLESimplePeripheral(ble)
+# led signal so you know it works
+led = Pin("LED", Pin.OUT).high()
 
 # Create a Pin object for the sensors, configure it as an input
 pin1 = Pin(18, Pin.IN)
