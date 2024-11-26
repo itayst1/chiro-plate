@@ -84,7 +84,7 @@ public class GameActivity extends AppCompatActivity {
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    new CountDownTimer((long) ((gameInstance.getTime() + 0.5) * 1000), 1000) {
+                    new CountDownTimer((long) ((gameInstance.getTime() + 0.4) * 1000), 1000) {
 
                         public void onTick(long millisUntilFinished) {
                             if (play)

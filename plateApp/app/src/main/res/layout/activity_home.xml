@@ -63,26 +63,6 @@
         app:layout_constraintVertical_bias="0.291"
         app:strokeColor="#00BC65" />
 
-    <Button
-        android:id="@+id/patients"
-        android:layout_width="140dp"
-        android:layout_height="70dp"
-        android:backgroundTint="#5B5F60"
-        android:shadowColor="#00BC65"
-        android:text="המטופלים שלי"
-        android:textColor="#FFFFFF"
-        android:textColorHighlight="#00BC65"
-        android:textColorHint="#00BC65"
-        android:textColorLink="@color/white"
-        android:textStyle="normal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/user_code"
-        app:layout_constraintVertical_bias="0.547"
-        app:strokeColor="#00BC65" />
-
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="259dp"
