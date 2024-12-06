@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="#3E403F"
     android:backgroundTint="#3E403F"
-    tools:context=".MainActivity">
+    tools:context=".ConnectActivity">
 
     <Button
         android:id="@+id/scan"

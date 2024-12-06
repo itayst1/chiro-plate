@@ -181,7 +181,8 @@ public class GameActivity extends AppCompatActivity {
                     iterations.setText("ניצחת!!");
                     winSound.start();
                     colors.setImageResource(R.drawable.inactive);
-                    gameInstance.getLevelsData().put(gameInstance.getLevel(), gameInstance.getLevelsData().get(GameInstance.getInstance().getLevel()).replace("undone", "done"));
+                    String levelData = gameInstance.getLevelsData().get(GameInstance.getInstance().getLevel());
+                    gameInstance.getLevelsData().put(gameInstance.getLevel(), levelData.substring(0, levelData.lastIndexOf(",")+1) + (gameInstance.getStars()+1));
                     break;
                 }
                 try {

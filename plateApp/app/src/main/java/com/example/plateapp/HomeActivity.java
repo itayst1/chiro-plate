@@ -30,6 +30,6 @@ public class HomeActivity extends AppCompatActivity {
 
     public void onDisconnectClick(View view){
         BluetoothController.getInstance().disconnect();
-        startActivity(new Intent(HomeActivity.this, MainActivity.class));
+        startActivity(new Intent(HomeActivity.this, ConnectActivity.class));
     }
 }

@@ -4,9 +4,12 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -36,11 +39,11 @@ public class LevelsActivity extends AppCompatActivity {
 
         levelsData = GameInstance.getInstance().getLevelsData();
 
-        if(levelsData.isEmpty()) {//isComplete,level,time,iterations,probabilities
-            levelsData.put(1, "undone,1,20,10,0.25,0.25,0.25,0.25");
-            levelsData.put(2, "undone,2,50,10,0.5,0,0.5,0");
-            levelsData.put(3, "undone,3,50,10,0,0.5,0,0.5");
-            levelsData.put(4, "undone,4,50,15,0,0.33,0.33,0.33");
+        if(levelsData.isEmpty()) {//level,time,iterations,probabilities,stars
+            levelsData.put(1, "1,20,10,0.25,0.25,0.25,0.25,0");
+            levelsData.put(2, "2,50,10,0.5,0,0.5,0,0");
+            levelsData.put(3, "3,50,20,0,0.5,0,0.5,0");
+            levelsData.put(4, "4,50,15,0,0.33,0.33,0.33,0");
         }
 
         initiateGrid();
@@ -54,28 +57,25 @@ public class LevelsActivity extends AppCompatActivity {
         Button temp = (Button) view;
         String[] data = levelsData.get(Integer.parseInt((String) temp.getText())).split(",");
         GameInstance.getInstance().setMode(false);
-        GameInstance.getInstance().setLevel(Integer.parseInt(data[1]));
-        GameInstance.getInstance().setTime(Integer.parseInt(data[2]));
-        GameInstance.getInstance().setIterations(Integer.parseInt(data[3]));
+        GameInstance.getInstance().setLevel(Integer.parseInt(data[0]));
+        GameInstance.getInstance().setTime(Integer.parseInt(data[1]));
+        GameInstance.getInstance().setIterations(Integer.parseInt(data[2]));
         double[] probabilities = new double[4];
-        for(int i = 4; i < 8; i++){
-            probabilities[i-4] = Double.parseDouble(data[i]);
+        for(int i = 3; i < 7; i++){
+            probabilities[i-3] = Double.parseDouble(data[i]);
         }
         GameInstance.getInstance().setProbabilities(probabilities);
+        GameInstance.getInstance().setStars(Integer.parseInt(data[7]));
         startActivity(new Intent(LevelsActivity.this, GameActivity.class));
     }
 
     public void initiateGrid(){
         TableRow row = new TableRow(this);
-        int numOfViews = 0;
         for(int i = 1; i <= levelsData.size(); i++){
-            if(numOfViews == 2){
-                numOfViews = 0;
-                levels.addView(row);
-                row = new TableRow(this);
-            }
             row.addView(createDeviceButton(i + ""));
-            numOfViews++;
+            row.addView(createStars(levelsData.get(i).split(",")[7]));
+            levels.addView(row);
+            row = new TableRow(this);
         }
         levels.addView(row);
     }
@@ -92,10 +92,21 @@ public class LevelsActivity extends AppCompatActivity {
         levelButton.setBackgroundColor(0xE05b5f60);
         levelButton.setTextColor(0xE0FFFFFF);
         levelButton.setOnClickListener(this::onLevelClick);
-
-        if(levelsData.get(Integer.parseInt(name)).split(",")[0].equals("done")){
-            levelButton.setBackgroundColor(0xE000bc65);
-        }
         return levelButton;
+    }
+
+    public Button createStars(String stars){
+        Button levelStars = new Button(LevelsActivity.this);
+        levelStars.setActivated(false);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            levelStars.setWidth(this.getWindow().getWindowManager().getCurrentWindowMetrics().getBounds().width()/2);
+        }
+        levelStars.setAllCaps(false);
+        levelStars.setText("stars: " + stars);
+        levelStars.setTextSize(35);
+        levelStars.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        levelStars.setBackgroundColor(0xE05b5f60);
+        levelStars.setTextColor(0xE0FFFFFF);
+        return levelStars;
     }
 }

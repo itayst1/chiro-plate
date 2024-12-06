@@ -8,6 +8,7 @@ public class GameInstance {
     private boolean m_tutorial;
     private int m_time, m_iterations;
     private double[] m_probabilities;
+    private int m_stars;
 
     private HashMap<Integer, String> levelsData;
 
@@ -19,6 +20,7 @@ public class GameInstance {
         this.m_time = 0;
         this.m_iterations = 0;
         this.m_probabilities = new double[] {0.0, 0.0, 0.0, 0.0};
+        m_stars = 0;
         levelsData = new HashMap<>();
     }
 
@@ -50,6 +52,8 @@ public class GameInstance {
         return this.m_probabilities;
     }
 
+    public int getStars() {return this.m_stars;}
+
     public void setLevel(int level){
         this.m_level = level;
     }
@@ -69,4 +73,6 @@ public class GameInstance {
     public void setProbabilities(double[] probabilities){
         this.m_probabilities = probabilities;
     }
+
+    public void setStars(int m_stars) {this.m_stars = m_stars;}
 }
