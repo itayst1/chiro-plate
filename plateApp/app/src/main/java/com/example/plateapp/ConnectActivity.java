@@ -122,6 +122,10 @@ public class ConnectActivity extends AppCompatActivity {
         }
     }
 
+    public void onContinueClick(View view){
+        startActivity(new Intent(ConnectActivity.this, LoginActivity.class));
+    }
+
     public Button createDeviceButton(String name){
         Button deviceButton = new Button(ConnectActivity.this);
         deviceButton.setAllCaps(false);
