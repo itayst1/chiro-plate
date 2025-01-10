@@ -8,5 +8,6 @@
     <string name="next">Next</string>
     <string name="previous">Previous</string>
     <string name="continue_no_plate"><u>המשך ללא צלחת</u></string>
+    <string name="continue_as_guest"><u>המשך כאורח</u></string>
     <string name="title_activity_home">HomeActivity</string>
 </resources>
