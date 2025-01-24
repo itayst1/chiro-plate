@@ -136,20 +136,21 @@ public class GameActivity extends AppCompatActivity {
             colors.setImageResource(R.drawable.inactive);
             boolean scored = false;
             while(play){
-                try {
-                    int data = Integer.parseInt(bluetoothController.readData());
-                    if (data == 0) {
-                        if(scored)
-                            colors.setImageResource(R.drawable.inactive);
-                        scored = false;
-                    } else if (!scored) {
-                        scored = true;
-                        updateScore(data, -1);
+                if(ServerClient.getClient().isConnected()) {
+                    try {
+                        int data = Integer.parseInt(bluetoothController.readData());
+                        if (data == 0) {
+                            if (scored)
+                                colors.setImageResource(R.drawable.inactive);
+                            scored = false;
+                        } else if (!scored) {
+                            scored = true;
+                            updateScore(data, -1);
+                        }
+                        Thread.sleep(50);
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                    Thread.sleep(50);
-                }
-                catch (Exception e){
-                    e.printStackTrace();
                 }
             }
         });
@@ -247,6 +248,12 @@ public class GameActivity extends AppCompatActivity {
     public void onExitClick(View view){
         play = false;
         startActivity(new Intent(GameActivity.this, HomeActivity.class));
+    }
+
+    @Override
+    public void onBackPressed() {
+        play = false;
+        super.onBackPressed();
     }
 
 }
